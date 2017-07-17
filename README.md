@@ -1,6 +1,6 @@
-# neteasy-news
+# vue-cnode-demo
 
-> first experience vue
+> 学了些vue做个完整的项目练手 - 谢谢[cNode社区](https://cnodejs.org)开放的后台数据接口，么么哒O(∩_∩)O～
 
 ## Build Setup
 
