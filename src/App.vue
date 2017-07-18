@@ -3,19 +3,25 @@
     <div v-if="isShowLogin">
       <Login/>
     </div>
-    <topic-list-page v-else></topic-list-page>
+    <div v-else>
+      <HeaderBar/>
+      <router-view></router-view>
+      <MenuBar/>
+    </div>
   </div>
 </template>
 
 <script>
-import TopicListPage from './components/containers/TopicListPage.vue';
-import Login from './components/containers/Login.vue'
+import Login from './components/containers/Login.vue';
+import MenuBar from './components/common/MenuBar.vue';
+import HeaderBar from './components/common/HeaderBar.vue';
 
 export default {
   name: 'app',
   components: {
-    TopicListPage,
-    Login
+    Login,
+    MenuBar,
+    HeaderBar
   },
   computed: {
     isShowLogin: function() {

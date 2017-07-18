@@ -30,6 +30,9 @@ export default new Vuex.Store({
         },
         getCurrentPage(state) {
             return state.currentPage;
+        },
+        getAccessToken(state) {
+            return state.accessToken;
         }
     },
     mutations: {

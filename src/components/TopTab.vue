@@ -1,6 +1,6 @@
 <template>
   	<tab>
-      <tab-item v-for="category in categories">{{category.name}}</tab-item>
+      <tab-item v-for="category in categories" @click="alert(1)">{{category.name}}</tab-item>
     </tab>
 </template>
 
@@ -22,6 +22,12 @@ export default {
       	{name: '问答',key: 'ask',queryData:'ask' }
       ]
       return { categories: categories }
+  },
+  methods: {
+    changeTab(queryData){
+      alert(1);
+      this.$store.commit('updateCurrentTab',queryData);
+    }
   }
 }
 </script>
