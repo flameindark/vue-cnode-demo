@@ -1,5 +1,5 @@
 <template>
-	<x-header :left-options="{backText: ''}">CNode</x-header>
+	<x-header :left-options="{backText: ''}" style="z-index:3">CNode</x-header>
 </template>
 
 <script>

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import TopicList from './components/TopicList';
+import TopicListDemo from './components/TopicList-demo';
 import NewTopic from './components/NewTopic';
 import Message from './components/Message';
 import Account from './components/Account';
@@ -13,12 +14,12 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
+      name: 'index',
       component: TopicList
     },
     {
-      path: '/newTopic',
-      name: 'newTopic',
+      path: '/publish',
+      name: 'publish',
       component: NewTopic
     },
     {
@@ -27,13 +28,13 @@ export default new Router({
     	component: Message
     },
     {
-    	path: '/account',
+    	path: '/account/:loginname',
     	name: 'account',
     	component: Account
     },
     {
       path: '/topic/:id',
-      name: 'TopicDetail',
+      name: 'topic',
       component: TopicDetail
     }
   ]

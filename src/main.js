@@ -8,9 +8,11 @@ import VueAxios from 'vue-axios'
 import Vuex from 'vuex';
 import moment from 'moment';
 import store from './store'
+import VueScroller from 'vue-scroller'
 
+
+Vue.use(VueScroller)
 Vue.use(VueAxios, axios);
-
 Vue.use(Vuex);
 
 Vue.prototype.moment = moment;

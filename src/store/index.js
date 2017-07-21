@@ -13,7 +13,14 @@ export default new Vuex.Store({
         topicList: [],
         moreList: [],
         isShowLogin: false,
-        currentPage: 1
+        currentPage: 1,
+        currentMenu: 'index',
+        loginInfo: {
+          avatarUrl: null,
+          id: null,
+          loginname: '',
+          accessToken: ''
+        },
     },
     getters: {
         getIsShowLogin(state) {
@@ -33,6 +40,12 @@ export default new Vuex.Store({
         },
         getAccessToken(state) {
             return state.accessToken;
+        },
+        getCurrentMenu(state) {
+            return state.currentMenu;
+        },
+        getLoginInfo(state) {
+            return state.loginInfo;
         }
     },
     mutations: {
@@ -40,7 +53,7 @@ export default new Vuex.Store({
             state.topicList = data;
         },
         loadMoreTopic(state, data) {
-            state.topicList.push(...data);
+            state.topicList = state.topicList.concat(data);
         },
         updateCurrentPage(state, data) {
             state.currentPage = data;
@@ -54,43 +67,22 @@ export default new Vuex.Store({
     },
     actions: {
         // 加载或刷新列表首页帖子数据
-        queryTopiclistData(store,{queryParam}){
-            this.axios.get(`https://cnodejs.org/api/v1/topics?limit=20&page=${currentPage}&tab=${queryParam}`)
-                .then(result => (
-                     store.commit('updateTopList',
-                        result.data.data.map(item=> {
-                            return {
-                                'src': item.author.avatar_url,
-                                'title': item.title,
-                                'desc': 'other',
-                                'url': '/article/'+ item.id
-                            }
-                        }))
-                ));
+        refreshTopiclistData(store,{tab}){
+            this.axios.get(`https://cnodejs.org/api/v1/topics?limit=20&page=1&tab=${tab}`)
+                .then(result => {
+                     store.commit('updateTopList',result.data.data);
+                });
             store.commit('updateCurrentPage',2);
         },
 
         // 加载更多帖子列表
-        loadMoreList(store, {queryParam}) {
-            this.axios.get(`https://cnodejs.org/api/v1/topics?limit=20&page=${state.currentPage}&tab=${queryParam}`)
-                .then(result => (
-                    // 更新帖子列表数据
-                    store.commit('loadMoreTopic',
-                        result.data.data.map(item=> {
-                            return {
-                                'src': item.author.avatar_url,
-                                'title': item.title,
-                                'desc': 'other',
-                                'url': '/article/'+ item.id
-                            }
-                        })
-                    )
-                )).then(
-                    // 更新当前已加载帖子的页数
-                    store.commit('updateCurrentPage',++state.currentPage)
-                )
+        loadMoreTopicList(store, {tab,page}) {
+            this.axios.get(`https://cnodejs.org/api/v1/topics?limit=20&page=${state.currentPage}&tab=${tab}&page=${page}`)
+                .then(result => {
+                    store.commit('loadMoreTopic',result.data.data);
+                })
+        },
 
-        }   
     }
 
 });

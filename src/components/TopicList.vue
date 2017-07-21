@@ -1,22 +1,55 @@
 <template>
-	<div>
-		<tab>
-	      <tab-item @on-item-click="getListData(category.queryData)" v-for="category in categories" >{{category.name}}</tab-item>
+	<div class="topic-list">
+		<tab class="nav-bar">
+	      <tab-item @on-item-click="changeTab(category.queryData)" v-for="category in categories">{{category.name}}</tab-item>
 	    </tab>
-		<div class="['wrapper']" ref="wrapper">
-			<div v-if="list.length>0" :class="['topic-list','content']">
-				<panel :list="list" :type="type"></panel>
-			</div>
-			<div v-else>
+	  	<scroller :on-refresh="refresh"
+            :on-infinite="infinite">
+		  	<div class="topic-wrap" v-if="list.length>0">
+		        <div v-for="i in list" class="topic-item">
+		          <router-link :to="{ name: 'topic', params: { id: i.id }}">
+		            <div class="topic-title">
+		              <div class="topic-label" :class="[i.top ? 'topic-label-top' : `topic-label-other`]">
+		                {{i.tab}}
+		              </div>
+		              <p v-text="i.title"></p>
+		            </div>
+		            <div class="topic-content">
+		              <router-link :to="{name: 'account', params: { loginname: i.author.loginname }}">
+		                <div class="avatar">
+		                  <img :src="i.author.avatar_url" alt="headImgUrl">
+		                </div>
+		              </router-link>
+		              <div class="topic-right">
+		                <div class="topic-right-top">
+		                  <div class="topic-name" v-text="i.author.loginname">
+		                  </div>
+		                  <div class="topic-count">
+		                    <span v-text="i.reply_count"></span> / {{i.visit_count}}
+		                  </div>
+		                </div>
+		                <div class="topic-right-bottom">
+		                  <div class="topic-time">
+		                    创建于：<span>{{i.create_at}}</span>
+		                  </div>
+		                  <div class="topic-pass">
+		                    {{i.last_reply_at}}
+		                  </div>
+		                </div>
+		              </div>
+		            </div>
+		          </router-link>
+		        </div>
+		    </div>
+		    <div v-else>
 				<load-more :tip="loadTip"></load-more>
 			</div>
-		</div>
+	    </scroller>
 	</div>
 </template>
 
 <script>
 	import { Panel,LoadMore,Tab,TabItem } from 'vux';
-	import BScroll from 'better-scroll';
 	import TopTab from './TopTab';
 
 	export default {
@@ -26,9 +59,6 @@
 			LoadMore,
 			Tab,
 			TabItem
-		},
-		created(){
-			this.getListData();
 		},
 		data () {
 			const categories = [
@@ -42,38 +72,65 @@
 		      	type: '1',
 		      	list: [],
 		      	loadTip: 'loading',
-		      	categories: categories
+		      	categories: categories,
+		      	currentListPage: 1,
+		      	currentTab: ''
 		    }
 	    },
+	    mounted() {
+	      this.refresh();
+	    },
 	    methods: {
-	    	getListData(queryData){
-	    		this.$store.commit('updateCurrentTab',queryData);
-				this.axios.get(`https://cnodejs.org/api/v1/topics?limit=20&tab=${queryData?queryData:''}`)
-			      	.then(result => (
-			      		this.list = result.data.data.map(item=> {
-					      	return {
-					      		'src': item.author.avatar_url,
-						      	'title': item.title,
-						      	'desc': 'other',
-						      	'url': '/topic/'+ item.id
-					      	};
-				      	})
-				  	)).then(
-			      		this.$nextTick(() => { 
-				      		this.scroll = new BScroll(this.$refs.wrapper, {}) 
-				      	})
-				  	)
+	    	changeTab(queryData) {
+	    		this.currentTab = queryData;
+	    		this.refresh();
 	    	},
+	    	refresh(){
+	    		setTimeout(() => {
+					this.$store.dispatch('refreshTopiclistData',{this.currentTab})
+				},1000)
+	    	},
+	    	infinite(done){
+	    		setTimeout(() => {
+	    			this.currentListPage++;
+		    		this.$store.dispatch('loadMoreTopicList',{this.currentTab,this.currentListPage});
+				},1000)
+	    	}
 	    }
 	}
 </script>
 
-<style>
-	/*.topic-list {
-		position: absolute;
-		top: 90px;
-		bottom: 0;
-		overflow: scroll;
-		width: 100%;
-	}*/
+<style lang="less">
+	.topic-list {
+		/**导航**/
+		.nav-bar {
+			z-index: 2;
+		}
+		/**话题列表**/
+		.topic-wrap {
+			.topic-item {
+				border-bottom: 1px solid #eee;
+				padding: 10px 0;
+				color: #222;
+				.topic-title {
+					font-size: 16px;
+				}
+				.topic-content {
+					font-size: 12px;
+					.avatar {
+						float: left;
+						width: 40px;
+						height: 40px;
+						display: inline-block;
+						img {
+							width: 100%;
+							height: 100%;
+							border-radius: 50%;
+						}
+					}
+				}
+			}
+
+		}
+	}
 </style>
