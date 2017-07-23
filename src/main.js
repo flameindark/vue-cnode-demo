@@ -3,22 +3,28 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
-import Vuex from 'vuex';
-import moment from 'moment';
+import Vuex from 'vuex'
+import moment from 'moment'
 import store from './store'
 import VueScroller from 'vue-scroller'
+import * as filters from './filters'
 
 
-Vue.use(VueScroller)
-Vue.use(VueAxios, axios);
+Vue.use(VueScroller);
 Vue.use(Vuex);
 
-Vue.prototype.moment = moment;
-Vue.prototype.changeTime = time => moment(time).startOf('minute').fromNow().replace(/hours?/, '小时').replace('ago', '前').replace(/days?/, '天').replace(/minutes?/, '分钟').replace(/\ban?/, '1').replace(/months?/, '个月').replace(/\byears?/, '年').replace(/\s/g, '').replace('fewseconds','分钟');
+//注册filters
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 
 Vue.config.productionTip = false
+
+//监听router的变化
+router.beforeEach(function(to,from,next){
+  store.dispatch('router_change',to.path);
+  next();
+})
 
 new Vue({
   el: '#app',

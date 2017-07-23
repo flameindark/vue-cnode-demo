@@ -1,67 +1,54 @@
-import shop from '../../api/shop'
 import * as types from '../mutation-types'
 
 // initial state
-// shape: [{ id, quantity }]
 const state = {
-  current_tab: 'all',
-  current_menu: 'home'
+  
+  isLogin: false,
+  loginInfo: {
+    avatarUrl: null,
+    id: null,
+    loginname: '',
+    accessToken: '',
+    message_num: 0
+  },
+  currentRouter: '/'
 }
 
-// getters
 const getters = {
-  getCurrentTab: state => state.current_tab,
-  getCurrentMenu: state => state.current_menu
+  currentRouter: state => state.currentRouter,
+  loginInfo: state => state.loginInfo
 }
+
 
 // actions
 const actions = {
-  checkout ({ commit, state }, products) {
-    const savedCartItems = [...state.added]
-    commit(types.CHECKOUT_REQUEST)
-    shop.buyProducts(
-      products,
-      () => commit(types.CHECKOUT_SUCCESS),
-      () => commit(types.CHECKOUT_FAILURE, { savedCartItems })
-    )
+  login({commit,state}, accessToken) {
+    commit('LOGIN')
+  },
+  logout({commit,state}){
+    commit('LOGOUT')
+  },
+  router_change({commit},data){
+    commit(types.ROUTER_CHANGE,data);
   }
 }
 
 // mutations
 const mutations = {
-  [types.ADD_TO_CART] (state, { id }) {
-    state.lastCheckout = null
-    const record = state.added.find(p => p.id === id)
-    if (!record) {
-      state.added.push({
-        id,
-        quantity: 1
-      })
-    } else {
-      record.quantity++
-    }
+  [types.LOGIN] (state){
+    state.isLogin = true;
   },
-
-  [types.CHECKOUT_REQUEST] (state) {
-    // clear cart
-    state.added = []
-    state.checkoutStatus = null
+  [types.LOGOUT] (state){
+    state.isLogin = false;
   },
-
-  [types.CHECKOUT_SUCCESS] (state) {
-    state.checkoutStatus = 'successful'
-  },
-
-  [types.CHECKOUT_FAILURE] (state, { savedCartItems }) {
-    // rollback to the cart saved before sending the request
-    state.added = savedCartItems
-    state.checkoutStatus = 'failed'
+  [types.ROUTER_CHANGE] (state,data){
+    state.currentRouter = data;
   }
 }
 
 export default {
   state,
-  getters,
   actions,
-  mutations
+  mutations,
+  getters
 }

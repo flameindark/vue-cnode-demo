@@ -1,15 +1,15 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import TopicList from './components/TopicList';
-import TopicListDemo from './components/TopicList-demo';
-import NewTopic from './components/NewTopic';
-import Message from './components/Message';
-import Account from './components/Account';
-import TopicDetail from './components/containers/TopicDetail';
+import TopicList from './views/TopicList';
+import TopicListDemo from './views/TopicList-demo';
+import NewTopic from './views/NewTopic';
+import Message from './views/Message';
+import Account from './views/Account';
+import TopicDetail from './views/TopicDetail';
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   // mode: 'history',
   routes: [
     {
@@ -38,4 +38,7 @@ export default new Router({
       component: TopicDetail
     }
   ]
-})
+});
+
+
+export default router

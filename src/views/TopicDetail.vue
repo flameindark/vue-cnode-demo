@@ -4,13 +4,16 @@
 			<h4 class="head-title" v-text="topic.title"></h4>
 			<div class="head-info">
 				<div class="avatar">
-		          <img :src="author.avatar_url" alt="headImgUrl">
-		        </div>
-		        <div class="info-detail">
-		        	<Badge text="置顶" />
-		        	<span class="author-name">{{author.loginname}}</span>
-		        	<p><span></span>前创建·<span></span>次预览</p>
-		        </div>
+		      <img :src="topic.author.avatar_url" alt="headImgUrl">
+		    </div>
+		    <div class="info-detail">
+		      <Badge :text="topic.tab|transformTab(topic.top)"/>
+		      <span class="author-name">{{topic.author.loginname}}</span>
+		      <p><span>{{topic.create_at|transformDateFromNow}}</span>创建·<span>{{topic.visit_count}}</span>次预览</p>
+		    </div>
+        <div class="collect-topic">
+          <Badge text="收藏" width="60" height="30" fontSize="18" />
+        </div>
 			</div>
 		</div>
 		<div class="content">
@@ -19,11 +22,11 @@
 	  	</div>
 	  	<div class="comment-wrap">
 	  		<div class="comment-count">
-		        {{reply_num}} 条回复
+		        {{topic.reply_num}} 条回复
 		    </div>
-		    <div class="comment-item" v-for="(c, index) in commentList">
+		    <div class="comment-item" v-for="(c, index) in topic.replies">
 		        <div class="comment-head">
-		          <router-link to="/">
+		          <router-link :to="'/account/'+c.author.loginname">
 		            <div class="avatar">
 		              <img :src="c.author.avatar_url" alt="headImgUrl">
 		            </div>
@@ -32,10 +35,11 @@
 		            <div class="comment-middle-top" v-text="c.author.loginname">
 		            </div>
 		            <div class="comment-middle-bottom">
-		              <span>{{index + 1}}楼</span> · {{c.create_at}}
+		              <span>{{index + 1}}楼</span> · {{c.create_at|transformDateFromNow}}
 		            </div>
 		          </div>
 		          <div class="comment-right">
+                <p></p>
 		          </div>
 		        </div>
 		        <div class="comment-content markdown" v-html="c.content">
@@ -45,87 +49,31 @@
 	</div>
 </template>
 <script>
-  import Badge from '../common/Badge';
+  import Badge from '../components/Badge';
   export default{
     data () {
       return {
-      	fontSize: 16,
-      	activeColor: '#333',
         page: 1,
         pageSize: 10,
-        author: {
-          id: '',
-          avatar_url: '',
-          name: ''
-        },
-        topic: {
-          title: '',
-          content: '',
-          create_at: '',
-          good: false,
-          id: '',
-          is_collect: false,
-          last_reply_at: '',
-          tab: '',
-          top: false,
-          visit_count: 0
-        },
-        commentList: [],
-        comment: [],
-        reply_num: 0,
+        topic: this.$store.getters.topic,
         popup: {
           replyId: null,
           show: false,
           content: '',
-          placeholder: '请在此处留下您的评论'
-        },
-        showExtBtnReply: true
+          placeholder: '请在这里填写评论'
+        }
       }
     },
+    components: {
+       Badge
+    },
     created () {
-    	this.onFetchDetail()
+    	this.$store.dispatch('onFetchTopicDetail',this.$route.params.id);
     },
     deactivated () {
       window.onscroll = null
     },
     methods: {
-      onFetchDetail () {
-        // 加载数据
-        let id = this.$route.params.id
-        this.axios.get('https://cnodejs.org/api/v1/topic/' + id, {
-          params: {
-            accesstoken: this.$store.getters.getAccessToken
-          }
-        })
-          .then(response => {
-          	console.log(response.data.data);
-            let result = response.data.data;
-            this.author = {
-              id: result.author_id,
-              name: result.author.loginname,
-              avatar_url: result.author.avatar_url
-            }
-            this.topic = {
-              title: result.title,
-              content: result.content,
-              create_at: result.create_at,
-              good: result.good,
-              id: result.id,
-              is_collect: result.is_collect,
-              last_reply_at: result.last_reply_at,
-              tab: result.tab,
-              top: result.top,
-              visit_count: result.visit_count
-            }
-            this.comment = result.replies
-            this.reply_num = result.reply_count
-            this.commentList = result.replies.slice(0, this.pageSize)
-          })
-          .catch(e => {
-            console.log(e)
-            alert(e)
-          })
-      },
       checkLogin () {
         let accessToken = this.$store.getters.accessToken
         if (!accessToken) {
@@ -299,6 +247,13 @@
 			.head-title {
 				text-align: center;
 			}
+      .collect-topic{
+        float:right;
+        margin-right:30px;
+        &:hover {
+          cursor: pointer;
+        }
+      }
 			.head-info {
 				&:after,&:before {
 					content: '';

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div v-if="isShowLogin">
+    <div v-if="isLogin">
       <Login/>
     </div>
     <div v-else>
@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import Login from './components/containers/Login.vue';
-import MenuBar from './components/common/MenuBar.vue';
-import HeaderBar from './components/common/HeaderBar.vue';
+import Login from './views/Login.vue';
+import MenuBar from './components/MenuBar.vue';
+import HeaderBar from './components/HeaderBar.vue';
 
 export default {
   name: 'app',
@@ -24,12 +24,15 @@ export default {
     HeaderBar
   },
   computed: {
-    isShowLogin: function() {
-      return this.$store.state.isShowLogin;
+    isLogin: function() {
+      return this.$store.state.isLogin;
     }
   }
 }
 </script>
 <style lang="less">
 @import '~vux/src/styles/reset.less';
+::-webkit-scrollbar {
+    display: none;
+}
 </style>

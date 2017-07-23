@@ -1,6 +1,5 @@
 <template>
   <div>
-    <nav-bar title="Refresh & Infinite"></nav-bar>
     <scroller style="top: 90px;"
               :on-refresh="refresh"
               :on-infinite="infinite"
@@ -15,12 +14,8 @@
 </template>
 
 <script>
-  import NavBar from './NavBar.vue'
   export default {
   	name: 'TopicListDemo',
-    components: {
-      NavBar
-    },
     data () {
       return {
         items: []
