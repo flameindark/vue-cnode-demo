@@ -6,6 +6,7 @@ import NewTopic from './views/NewTopic';
 import Message from './views/Message';
 import Account from './views/Account';
 import TopicDetail from './views/TopicDetail';
+import Login from './views/Login'
 
 Vue.use(Router)
 
@@ -36,6 +37,11 @@ const router = new Router({
       path: '/topic/:id',
       name: 'topic',
       component: TopicDetail
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     }
   ]
 });

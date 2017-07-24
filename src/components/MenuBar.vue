@@ -31,7 +31,8 @@ export default {
   },
   computed: {
     message_num(){
-      return this.$store.getters.loginInfo.message_num === 0 ?  '' : this.$store.getters.loginInfo.message_num + ''
+      let message_num = this.$store.getters.loginInfo.message_num;
+      return message_num ?  message_num + '' : '';
     }
   }
 }

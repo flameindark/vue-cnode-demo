@@ -1,5 +1,5 @@
 <template>
-	<div class="wrap">
+	<div class="wrap" v-if="topic">
 		<div class="topic-intro">
 			<h4 class="head-title" v-text="topic.title"></h4>
 			<div class="head-info">
@@ -67,7 +67,7 @@
     components: {
        Badge
     },
-    created () {
+    beforeCreate () {
     	this.$store.dispatch('onFetchTopicDetail',this.$route.params.id);
     },
     deactivated () {

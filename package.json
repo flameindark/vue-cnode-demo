@@ -17,6 +17,7 @@
     "vue-router": "^2.7.0",
     "vue-scroller": "^2.2.1",
     "vuex": "^2.3.1",
+    "vuex-i18n": "^1.4.3",
     "vux": "^2.5.2"
   },
   "devDependencies": {

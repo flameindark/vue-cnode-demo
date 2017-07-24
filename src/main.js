@@ -8,17 +8,24 @@ import moment from 'moment'
 import store from './store'
 import VueScroller from 'vue-scroller'
 import * as filters from './filters'
+import  { ToastPlugin } from 'vux'
+import vuexI18n from 'vuex-i18n'
 
+// I18n setting
+Vue.use(vuexI18n.plugin, store);
 
 Vue.use(VueScroller);
 Vue.use(Vuex);
+
+//use Toast Plugin
+Vue.use(ToastPlugin)
 
 //注册filters
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 //监听router的变化
 router.beforeEach(function(to,from,next){

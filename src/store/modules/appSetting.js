@@ -1,4 +1,5 @@
 import * as types from '../mutation-types'
+import axios from 'axios'
 
 // initial state
 const state = {
@@ -20,20 +21,15 @@ const getters = {
 }
 
 
-// actions
 const actions = {
-  login({commit,state}, accessToken) {
-    commit('LOGIN')
-  },
   logout({commit,state}){
     commit('LOGOUT')
   },
   router_change({commit},data){
     commit(types.ROUTER_CHANGE,data);
-  }
+  },
 }
 
-// mutations
 const mutations = {
   [types.LOGIN] (state){
     state.isLogin = true;
@@ -43,8 +39,16 @@ const mutations = {
   },
   [types.ROUTER_CHANGE] (state,data){
     state.currentRouter = data;
+  },
+  [types.SET_LOGININFO] (state,data){
+    state.loginInfo = data
+  },
+  [types.SET_UNREAD_MESSAGE_NUM] (state,data){
+    state.loginInfo.message_num = data
   }
 }
+
+
 
 export default {
   state,

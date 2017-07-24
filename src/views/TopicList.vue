@@ -85,7 +85,6 @@
 				this.$store.dispatch('refreshTopiclistData');
 	    	},
 	    	infinite(){
-	    		alert(1);
 	    		this.$store.dispatch('change_tab',currentTab);
 		    	this.$store.dispatch('loadMoreTopicList');
 	    	},
