@@ -12,13 +12,15 @@ const state = {
         currentTab: 'all',
         topicList: [],
         currentPage: 1,
-        topic: {}
+        topic: {},
+        loadTopicDetailSuccess: false,
 }
 
 const getters = {
     topicList: state => state.topicList,
     currentTab: state => state.currentTab,
-    topic: state => state.topic
+    topic: state => state.topic,
+    loadTopicDetailSuccess: state => state.loadTopicDetailSuccess
 }
 
 const mutations = {
@@ -35,20 +37,21 @@ const mutations = {
             state.currentTab = data
         },
         [types.FETCH_TOPIC_DATA] (state,data) {
-            state.topic = data
+            state.topic = data;
         }
 }
 
 const actions = {
+    //首页tab页的改动
     change_tab ({ commit }, tab) {
         commit('CHANGE_TAB',tab)
     },
+
     // 加载或刷新列表首页帖子数据
     refreshTopiclistData({commit,state}){
         commit(types.UPDATE_CURRENT_PAGE);
         axios.get(`https://cnodejs.org/api/v1/topics?limit=20&page=1&tab=${state.currentTab}`)
             .then(result => {
-                console.log(result.data.data);
                  commit('REFRESH_TOPICS_LIST',result.data.data);
             });
     },
@@ -64,36 +67,16 @@ const actions = {
 
     // 加载帖子的详细内容
     onFetchTopicDetail ({commit},topicId) {
-        axios.get('https://cnodejs.org/api/v1/topic/' + topicId)
+        axios.get(`https://cnodejs.org/api/v1/topic/${topicId}`)
           .then(result => {
             commit('FETCH_TOPIC_DATA',result.data.data);
-            
-            // this.author = {
-            //   id: result.author_id,
-            //   name: result.author.loginname,
-            //   avatar_url: result.author.avatar_url
-            // }
-            // this.topic = {
-            //   title: result.title,
-            //   content: result.content,
-            //   create_at: result.create_at,
-            //   good: result.good,
-            //   id: result.id,
-            //   is_collect: result.is_collect,
-            //   last_reply_at: result.last_reply_at,
-            //   tab: result.tab,
-            //   top: result.top,
-            //   visit_count: result.visit_count
-            // }
-            // this.comment = result.replies
-            // this.reply_num = result.reply_count
-            // this.commentList = result.replies.slice(0, this.pageSize)
           })
           .catch(e => {
             console.log(e)
             alert(e)
           })
-      }
+    },
+
 }
 
 

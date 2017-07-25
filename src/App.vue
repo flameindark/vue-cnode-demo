@@ -32,6 +32,7 @@ export default {
 </script>
 <style lang="less">
 @import '~vux/src/styles/reset.less';
+@import './assets/style/github-markdown.css';
 
 html, body {
     height: 100%;

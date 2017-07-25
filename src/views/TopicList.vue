@@ -1,7 +1,7 @@
 <template>
 	<div class="topic-list">
 		<tab class="nav-bar">
-	      <tab-item @on-item-click="changeTab(category.queryData)" v-for="category in categories" :text="category.name">{{category.name}}</tab-item>
+	      <tab-item @on-item-click="changeTab(category.queryData)" v-for="category in categories" :text="category.name" :selected="currentTab===category.queryData">{{category.name}}</tab-item>
 	    </tab>
 	  	<scroller :on-refresh="refresh"
             :on-infinite="infinite" class="scroller-wrap">
@@ -11,7 +11,7 @@
 		            <div class="topic-title">
 		              <div class="topic-label" :class="[i.top ? 'topic-label-top' : `topic-label-other`]">
 		              	<div v-if="isShowBadge(i)">
-		              		<Badge :text="i.tab|transformTab(i.top)"/>
+		              		<Badge :text="i.tab|transformTab(i.top,i.good)"/>
 		              	</div>
 		              </div>
 		              <p v-text="i.title"></p>
@@ -75,18 +75,30 @@
 		      	categories: categories,
 		    }
 	    },
+	    computed: {
+	    	currentTab : function () {
+	    		return this.$store.getters.currentTab;
+	    	}
+	    },
 	    methods: {
 	    	changeTab(queryData) {
 	    		currentTab = queryData;
-	    		this.refresh();
-	    	},
-	    	refresh(){
 	    		this.$store.dispatch('change_tab',currentTab);
 				this.$store.dispatch('refreshTopiclistData');
 	    	},
-	    	infinite(){
-	    		this.$store.dispatch('change_tab',currentTab);
-		    	this.$store.dispatch('loadMoreTopicList');
+	    	refresh(done){
+	    		setTimeout(() => {
+		    		this.$store.dispatch('change_tab',currentTab);
+					this.$store.dispatch('refreshTopiclistData');
+					done()
+        		}, 1000)
+	    	},
+	    	infinite(done){
+	    		setTimeout(() => {
+		    		this.$store.dispatch('change_tab',currentTab);
+			    	this.$store.dispatch('loadMoreTopicList');
+			    	done()
+		    	}, 1000)
 	    	},
 	    	isShowBadge(item){
 	    		return item.tab||item.top || item.good

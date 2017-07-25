@@ -1,84 +1,110 @@
 <template>
-	<div class="wrap" v-if="topic">
-		<div class="topic-intro">
-			<h4 class="head-title" v-text="topic.title"></h4>
-			<div class="head-info">
-				<div class="avatar">
-		      <img :src="topic.author.avatar_url" alt="headImgUrl">
-		    </div>
-		    <div class="info-detail">
-		      <Badge :text="topic.tab|transformTab(topic.top)"/>
-		      <span class="author-name">{{topic.author.loginname}}</span>
-		      <p><span>{{topic.create_at|transformDateFromNow}}</span>创建·<span>{{topic.visit_count}}</span>次预览</p>
-		    </div>
-        <div class="collect-topic">
-          <Badge text="收藏" width="60" height="30" fontSize="18" />
-        </div>
-			</div>
-		</div>
-		<div class="content">
-	  		<div class="content-wrap markdown" v-html="topic.content">
-	    	</div>
-	  	</div>
-	  	<div class="comment-wrap">
-	  		<div class="comment-count">
-		        {{topic.reply_num}} 条回复
-		    </div>
-		    <div class="comment-item" v-for="(c, index) in topic.replies">
-		        <div class="comment-head">
-		          <router-link :to="'/account/'+c.author.loginname">
-		            <div class="avatar">
-		              <img :src="c.author.avatar_url" alt="headImgUrl">
-		            </div>
-		          </router-link>
-		          <div class="comment-middle">
-		            <div class="comment-middle-top" v-text="c.author.loginname">
-		            </div>
-		            <div class="comment-middle-bottom">
-		              <span>{{index + 1}}楼</span> · {{c.create_at|transformDateFromNow}}
-		            </div>
-		          </div>
-		          <div class="comment-right">
-                <p></p>
-		          </div>
-		        </div>
-		        <div class="comment-content markdown" v-html="c.content">
-		        </div> 
-		    </div>
-	  	</div>
-	</div>
+  <div class="wrap">
+  	<div v-if="topic">
+  		<div class="topic-intro">
+  			<h4 class="head-title" v-text="topic.title"></h4>
+  			<div class="head-info">
+  				<div class="avatar">
+  		      <img :src="topic.author.avatar_url" alt="headImgUrl">
+  		    </div>
+  		    <div class="info-detail">
+  		      <Badge :text="topic.tab|transformTab(topic.top,topic.good)"/>
+  		      <span class="author-name">{{topic.author.loginname}}</span>
+  		      <p><span>{{topic.create_at|transformDateFromNow}}</span>创建·<span>{{topic.visit_count}}</span>次预览</p>
+  		    </div>
+          <div class="collect-topic"> 
+            <div :class="{iscollect:isCollect,collect:true}" @click="onLikeTopic">收藏</div>
+          </div>
+  			</div>
+  		</div>
+  		<div class="content">
+  	  		<div class="content-wrap markdown-body" v-html="topic.content">
+  	    	</div>
+  	  	</div>
+  	  	<div class="comment-wrap">
+  	  		<div class="comment-count">
+  		        {{topic.reply_num ? topic.reply_num:0}} 条回复
+  		    </div>
+  		    <div class="comment-item" v-for="(c, index) in topic.replies">
+  		        <div class="comment-head">
+  		          <router-link :to="'/account/'+c.author.loginname">
+  		            <div class="avatar">
+  		              <img :src="c.author.avatar_url" alt="headImgUrl">
+  		            </div>
+  		          </router-link>
+  		          <div class="comment-middle">
+  		            <div class="comment-middle-top" v-text="c.author.loginname">
+  		            </div>
+  		            <div class="comment-middle-bottom">
+  		              <span>{{index + 1}}楼</span> · {{c.create_at|transformDateFromNow}}
+  		            </div>
+  		          </div>
+  		          <div class="comment-right">
+                  <p></p>
+  		          </div>
+  		        </div>
+  		        <div class="comment-content markdown-body" v-html="c.content">
+  		        </div> 
+  		    </div>
+  	  	</div>
+  	</div>
+    <div v-else>
+      <loading :value="true"></loading>
+    </div>
+  </div>
 </template>
 <script>
-  import Badge from '../components/Badge';
+  import Badge from '../components/Badge'
+  import { Loading } from 'vux'
   export default{
     data () {
       return {
         page: 1,
         pageSize: 10,
-        topic: this.$store.getters.topic,
-        popup: {
-          replyId: null,
-          show: false,
-          content: '',
-          placeholder: '请在这里填写评论'
-        }
+        topic: null
       }
     },
     components: {
-       Badge
+       Badge,
+       Loading
     },
-    beforeCreate () {
-    	this.$store.dispatch('onFetchTopicDetail',this.$route.params.id);
+    watch: {
+    '$route': 'fetchData'
+    },
+    created () {
+      this.fetchData();
     },
     deactivated () {
       window.onscroll = null
     },
+    computed: {
+      isDataLoadingSuccess: function () {
+        return this.$store.getters.topic.id === this.$route.params.id;
+      },
+      isCollect: function() {
+        return this.topic.is_collect;
+      }
+    },
     methods: {
+      fetchData(){
+        this.axios.get('https://cnodejs.org/api/v1/topic/' + this.$route.params.id)
+          .then(result => {
+            this.topic = result.data.data;
+          })
+          .catch(e => {
+            console.log(e);
+            this.$vux.toast.show({
+                text: '操作失败',
+                type: 'warn'
+            })
+          })
+      },
       checkLogin () {
         let accessToken = this.$store.getters.accessToken
         if (!accessToken) {
           this.$vux.toast.show({
-            text: '请先登录'
+            text: '请先登录',
+            type: 'warn'
           })
           this.$router.push('/login')
           return false
@@ -86,79 +112,19 @@
           return true
         }
       },
-      onReplyComment (id, name, index) {
-        if (this.checkLogin()) {
-          this.popup.replyId = id
-          this.popup.placeholder = `正在回复${index + 1}楼，${name}`
-          this.popup.show = true
-          console.log(this.$refs.input)
-          this.$refs.input.onFocus()
-        }
-      },
-      onReplytopic () {
-        if (this.checkLogin()) {
-          this.popup.replyId = null
-          this.popup.placeholder = `正在回复作者，${this.author.name}`
-          this.popup.show = true
-          console.log(this.$refs.input)
-          this.$refs.input.onFocus()
-        }
-      },
-      onSendComment () {
-        if (this.checkLogin()) {
-          if (!this.popup.content) {
-            this.$vux.toast.show({
-              text: '评论不能为空'
-            })
-          } else {
-            this.$loading.show()
-            this.$axios.post(`/topic/${this.topic.id}/replies`, {
-              accesstoken: this.$store.getters.accessToken,
-              content: this.popup.content,
-              reply_id: this.popup.replyId
-            })
-              .then(result => {
-                console.log(result)
-                this.comment.push({
-                  author: {
-                    avatar_url: this.$store.getters.loginInfo.avatarUrl,
-                    loginname: this.$store.getters.loginInfo.loginname
-                  },
-                  content: this.popup.content,
-                  create_at: new Date(),
-                  id: result.data.reply_id,
-                  reply_id: null,
-                  ups: []
-                })
-                this.popup.show = false
-                this.$vux.toast.show({
-                  text: '评论成功'
-                })
-                this.$loading.hide()
-              })
-              .catch(e => {
-                console.log(e)
-                this.$vux.toast.show({
-                  text: '操作失败'
-                })
-                this.$loading.hide()
-              })
-          }
-        }
-      },
-      onLikeThistopic () {
+      onLikeTopic () {
         if (this.checkLogin()) {
           let url
           let toastText
-          if (!this.topic.is_collect) {
-            url = '/topic_collect/collect'
+          if (!this.isCollect) {
+            url = 'https://cnodejs.org/api/v1/topic_collect/collect'
             toastText = '收藏成功'
           } else {
-            url = '/topic_collect/de_collect'
+            url = 'https://cnodejs.org/api/v1/topic_collect/de_collect'
             toastText = '取消收藏成功'
           }
           this.$axios.post(url, {
-            accesstoken: this.$store.getters.accessToken,
+            accesstoken: this.$store.getters.loginInfo.accessToken,
             topic_id: this.topic.id
           })
             .then(result => {
@@ -171,51 +137,11 @@
             .catch(e => {
               console.log(e)
               this.$vux.toast.show({
-                text: '操作失败'
+                text: '操作失败',
+                type: 'warn'
               })
             })
         }
-      },
-      onLikeThisComment (id, index) {
-        if (this.checkLogin()) {
-          this.$axios.post(`/reply/${id}/ups`, {
-            accesstoken: this.$store.getters.accessToken
-          })
-            .then(result => {
-              let toastText
-              if (result.data.action === 'down') {
-                toastText = '取消点赞成功'
-                let removeIndex = this.comment[index].ups.indexOf(this.$store.getters.loginInfo.id)
-                this.comment[index].ups.splice(removeIndex, 1)
-              } else {
-                toastText = '点赞成功'
-                this.comment[index].ups.push(this.$store.getters.loginInfo.id)
-              }
-              this.$vux.toast.show({
-                text: toastText
-              })
-            })
-            .catch(e => {
-              console.log(e)
-              this.$vux.toast.show({
-                text: '操作失败'
-              })
-            })
-        }
-      },
-      onLoadMore () {
-        let page = this.page
-        let pageSize = this.pageSize
-        let fetchComment = this.comment.slice(page * pageSize, (page + 1) * pageSize)
-        if (fetchComment.length) {
-          this.commentList = this.commentList.concat(fetchComment)
-          this.page++
-        }
-      }
-    },
-    computed: {
-      minHeight: () => {
-        return (document.body.clientHeight >= 400 && document.body.clientHeight <= 736) ? document.body.clientHeight : window.screen.height
       }
     }
   }
@@ -248,10 +174,22 @@
 				text-align: center;
 			}
       .collect-topic{
-        float:right;
-        margin-right:30px;
+        float: right;
+        margin-right: 30px;
+        background-color: #66FA76;
         &:hover {
           cursor: pointer;
+        }
+        .collect {
+          background-color: #66FA76;
+          width: 60px;
+          height: 30px;
+          line-height: 30px;
+          text-align: center;
+          color: #fff;
+        }
+        .iscollect {
+          background-color: #ccc;
         }
       }
 			.head-info {
@@ -286,233 +224,5 @@
 				padding: 18px;
 			}
 		}
-	}
-
-	/**markdown样式--- 来自(http://localhost:8080/#/topic/58ad76db7872ea0864fedfcc)	**/
-	.markdown {
-    @font-size: 14px;
-    @line-height: 20px;
-    @color: #333;
-    @four-space: 34px;
-    @four-space-css3: ~"4ch"; // some browsers support char spacing
-    @two-space-css3: ~"2ch"; // less does not support ch very well
-    @ul-tick: "*";
-    @strong-char: "__";
-    @em-char: "*";
-
-    // makes things like pre tags play more nicely with mobile
-    word-wrap: break-word;
-
-    &, h1, h2, h3, h4, h5, h6, pre, code, blockquote, em, strong, code {
-        font-size: @font-size;
-        line-height: @line-height;
-        font-weight: normal;
-        font-style: normal;
-        font-family: consolas,monaco,courier,"courier new",fixed-width;
-        color: @color;
-    }
-
-    h1, h2, h3, h4, h5, h6, pre, code, blockquote, ol, ul, li, p, section, header, footer {
-        float: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    h1, p, ul, ol, pre, blockquote {
-        margin-top: @line-height;
-        margin-bottom: @line-height;
-    }
-
-    h1 {
-        position: relative;
-        display: inline-block;
-
-        // table-cell puts on own line and limits width to text
-        display: table-cell;
-
-        padding: @line-height 0 @line-height * 2;
-        margin: 0;
-        overflow: hidden;
-
-        // `h1:after` creates something as the last child of the h1,
-        // likewise `:before` creates something as the first child
-        &:after {
-            // 100 characters wide max
-            content: "====================================================================================================";
-            position: absolute;
-            bottom: @line-height;
-            left: 0;
-        }
-    }
-
-    // this matches the next sibling after an h1 (apart from a pure text node)
-    // since h1s use padding instead of margin, I did not want to double pad
-    h1 + * {
-        margin-top: 0;
-    }
-
-    h2, h3, h4, h5, h6 {
-        position: relative;
-        margin-bottom: @line-height;
-    }
-
-    h2:before,
-    h3:before,
-    h4:before,
-    h5:before,
-    h6:before {
-        content: "## ";
-        display: inline;
-    }
-    h3:before {
-        content: "### ";
-    }
-    h4:before {
-        content: "#### ";
-    }
-    h5:before {
-        content: "##### ";
-    }
-    h6:before {
-        content: "###### ";
-    }
-
-    li {
-        position: relative;
-        display: block;
-        padding-left: @four-space;
-        padding-left: @four-space-css3;
-    }
-
-    li:after {
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-
-    ul>li:after {
-        content: @ul-tick;
-    }
-
-    ol {
-        // Auto-increments the numbering for ordered lists.
-        counter-reset:ol;
-    }
-    ol>li:after {
-        content: counter(ol) ".";
-        counter-increment: ol;
-    }
-
-    pre {
-        margin-left: @four-space;
-        padding-left: @four-space-css3;
-    }
-    blockquote {
-        position: relative;
-        padding-left: @four-space/2;
-        padding-left: @two-space-css3;
-        overflow: hidden;
-
-        &:after {
-            // 100 lines max
-            // the \A becomes a newline character and `white-space: pre`
-            // makes it act like a <br>
-            content: ">\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>";
-            white-space: pre;
-            position: absolute;
-            top: 0;
-            left: 0;
-            font-size: @font-size;
-            line-height: @line-height;
-        }
-    }
-
-    strong:before, strong:after {
-        content: @strong-char;
-        display: inline;
-    }
-
-    em:before, em:after {
-        content: @em-char;
-        display: inline;
-    }
-
-
-    a {
-        text-decoration: none;
-    }
-    a:before {
-        content: "[";
-        display: inline;
-        color: @color;
-    }
-    a:after {
-        content: ~'"](" attr(href) ")"';
-        display: inline;
-        color: @color;
-    }
-
-    code { font-weight: 100; }
-
-    code:before,
-    code:after {
-        content: "`";
-        display: inline;
-    }
-
-    pre code:before,
-    pre code:after {
-        content: none;
-    }
-
-    hr {
-        position: relative;
-        height: @line-height;
-        font-size: 0;
-        line-height: 0;
-        overflow: hidden;
-        border: 0;
-        margin-bottom: @line-height;
-
-        &:after {
-            // 100 characters wide max
-            // older ie versions do not show the content
-            content: "----------------------------------------------------------------------------------------------------";
-            position: absolute;
-            top: 0;
-            left: 0;
-            font-size: @font-size;
-            line-height: @line-height;
-            width: 100%;
-            word-wrap: break-word;
-        }
-    }
-
-    // only opera support before and after with img :(
-    // img {
-    //     display: inline-block;
-    //     &:before {
-    //         content: ~'"![" attr(alt)';
-    //         display: inline-block;
-    //     }
-    //     &:after {
-    //         content: ~'"](" attr(src) ")"';
-    //         display: inline-block;
-    //     }
-    // }
-	}
-
-	// firefox cannot put position absolute inside table-cell
-	@-moz-document url-prefix() {
-	    .markdown h1 { display: block; }
-	}
-
-	.markdown-ones {
-	    ol>li:after {
-	        content: "1.";
-	    }
-	}
-	.markdown img{
-		max-width:100%;
 	}
 </style>

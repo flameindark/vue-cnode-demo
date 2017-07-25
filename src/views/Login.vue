@@ -50,7 +50,8 @@
           })
             .then(result => {
               localStorage.setItem('accessToken', accessToken);
-              this.$store.commit('SET_LOGININFO', {...result.data,accessToken});
+              this.$store.commit('LOGIN_CHECK', {...result.data,accessToken});
+              this.setLoginInfoDetail(result.data.loginname);
               this.$vux.toast.show({
                 text: '登录成功'
               });
@@ -70,6 +71,12 @@
         then(result => {
           this.$store.commit('SET_UNREAD_MESSAGE_NUM',1);
           this.$router.push('/');
+        })
+      },
+      setLoginInfoDetail(loginname){
+        this.axios.get('https://cnodejs.org/api/v1/user/'+loginname).
+        then(result => {
+          this.$store.commit('SET_LOGIN_INFO',result.data.data);
         })
       }
     }

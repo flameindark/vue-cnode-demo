@@ -1,9 +1,11 @@
 import moment from 'moment'
 
-export function transformTab (tab, isTop) {
+export function transformTab (tab, isTop,isGood) {
   if (isTop) {
     return '置顶'
-  } else {
+  }else if(isGood) {
+    return '精华'
+  }else {
     switch (tab) {
       case 'share':
         return '分享'
@@ -11,8 +13,6 @@ export function transformTab (tab, isTop) {
         return '问答'
       case 'job':
         return '招聘'
-      case 'good':
-        return '精华'
       case 'top':
         return '置顶'
       default: 

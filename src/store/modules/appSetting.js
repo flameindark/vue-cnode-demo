@@ -5,23 +5,22 @@ import axios from 'axios'
 const state = {
   
   isLogin: false,
-  loginInfo: {
-    avatarUrl: null,
-    id: null,
-    loginname: '',
-    accessToken: '',
-    message_num: 0
-  },
+  loginInfo: null,
+  loginInfoDetail: null,
   currentRouter: '/'
 }
 
 const getters = {
   currentRouter: state => state.currentRouter,
-  loginInfo: state => state.loginInfo
+  loginInfo: state => state.loginInfo,
+  loginInfoDetail: state => state.loginInfoDetail
 }
 
 
 const actions = {
+  set_login_info({commit,state},data) {
+    commit('SET_LOGIN_INFO',data)
+  },
   logout({commit,state}){
     commit('LOGOUT')
   },
@@ -31,20 +30,22 @@ const actions = {
 }
 
 const mutations = {
-  [types.LOGIN] (state){
+  [types.SET_LOGIN_INFO] (state,data){
+    state.loginInfoDetail = data;
     state.isLogin = true;
   },
   [types.LOGOUT] (state){
+    state.loginInfo = null;
     state.isLogin = false;
   },
   [types.ROUTER_CHANGE] (state,data){
     state.currentRouter = data;
   },
-  [types.SET_LOGININFO] (state,data){
+  [types.LOGIN_CHECK] (state,data){
     state.loginInfo = data
   },
   [types.SET_UNREAD_MESSAGE_NUM] (state,data){
-    state.loginInfo.message_num = data
+    state.loginInfo= { ...state.loginInfo , message_num:data }
   }
 }
 

@@ -31,8 +31,7 @@ export default {
   },
   computed: {
     message_num(){
-      let message_num = this.$store.getters.loginInfo.message_num;
-      return message_num ?  message_num + '' : '';
+      return ''
     }
   }
 }

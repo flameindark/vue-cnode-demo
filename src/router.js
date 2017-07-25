@@ -29,7 +29,7 @@ const router = new Router({
     	component: Message
     },
     {
-    	path: '/account/:loginname',
+    	path: '/account',
     	name: 'account',
     	component: Account
     },
@@ -42,6 +42,11 @@ const router = new Router({
       path: '/login',
       name: 'login',
       component: Login
+    },
+    {
+      path: '/user/:loginname',
+      name: 'user',
+      component: Account
     }
   ]
 });
