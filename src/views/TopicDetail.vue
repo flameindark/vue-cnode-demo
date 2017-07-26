@@ -13,7 +13,7 @@
   		      <p><span>{{topic.create_at|transformDateFromNow}}</span>创建·<span>{{topic.visit_count}}</span>次预览</p>
   		    </div>
           <div class="collect-topic"> 
-            <div :class="{iscollect:isCollect,collect:true}" @click="onLikeTopic">收藏</div>
+            <div :class="{iscollect:topic.is_collect,collect:true}" @click="onLikeTopic">收藏</div>
           </div>
   			</div>
   		</div>
@@ -23,7 +23,7 @@
   	  	</div>
   	  	<div class="comment-wrap">
   	  		<div class="comment-count">
-  		        {{topic.reply_num ? topic.reply_num:0}} 条回复
+  		        {{topic.reply_count ? topic.reply_count:0}} 条回复
   		    </div>
   		    <div class="comment-item" v-for="(c, index) in topic.replies">
   		        <div class="comment-head">
@@ -61,7 +61,7 @@
       return {
         page: 1,
         pageSize: 10,
-        topic: null
+        topic: null,
       }
     },
     components: {
@@ -73,6 +73,7 @@
     },
     created () {
       this.fetchData();
+      console.log(this.topic);
     },
     deactivated () {
       window.onscroll = null
@@ -80,19 +81,23 @@
     computed: {
       isDataLoadingSuccess: function () {
         return this.$store.getters.topic.id === this.$route.params.id;
-      },
-      isCollect: function() {
-        return this.topic.is_collect;
       }
     },
     methods: {
       fetchData(){
-        this.axios.get('https://cnodejs.org/api/v1/topic/' + this.$route.params.id)
+        let url;
+        if(this.$store.getters.loginInfo){
+          url = `https://cnodejs.org/api/v1/topic/${this.$route.params.id}?accesstoken=${this.$store.getters.loginInfo.accessToken}`;
+        }else{
+          url = `https://cnodejs.org/api/v1/topic/${this.$route.params.id}`;
+        }
+        this.axios.get(url)
           .then(result => {
             this.topic = result.data.data;
+            this.iscollect = result.data.data.is_collect;
+            console.log(this.topic);
           })
           .catch(e => {
-            console.log(e);
             this.$vux.toast.show({
                 text: '操作失败',
                 type: 'warn'
@@ -100,8 +105,7 @@
           })
       },
       checkLogin () {
-        let accessToken = this.$store.getters.accessToken
-        if (!accessToken) {
+        if (!this.$store.getters.loginInfo) {
           this.$vux.toast.show({
             text: '请先登录',
             type: 'warn'
@@ -114,22 +118,21 @@
       },
       onLikeTopic () {
         if (this.checkLogin()) {
-          let url
-          let toastText
-          if (!this.isCollect) {
-            url = 'https://cnodejs.org/api/v1/topic_collect/collect'
-            toastText = '收藏成功'
+          let url;
+          let toastText;
+          if (!this.topic.is_collect) {
+            url = 'https://cnodejs.org/api/v1/topic_collect/collect';
+            toastText = '收藏成功';
           } else {
-            url = 'https://cnodejs.org/api/v1/topic_collect/de_collect'
-            toastText = '取消收藏成功'
+            url = 'https://cnodejs.org/api/v1/topic_collect/de_collect';
+            toastText = '取消收藏成功';
           }
-          this.$axios.post(url, {
+          this.axios.post(url, {
             accesstoken: this.$store.getters.loginInfo.accessToken,
             topic_id: this.topic.id
           })
             .then(result => {
-              console.log(result)
-              this.topic.is_collect = !this.topic.is_collect
+              this.topic.is_collect = !this.topic.is_collect;
               this.$vux.toast.show({
                 text: toastText
               })

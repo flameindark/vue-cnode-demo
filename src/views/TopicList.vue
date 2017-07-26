@@ -1,7 +1,7 @@
 <template>
 	<div class="topic-list">
 		<tab class="nav-bar">
-	      <tab-item @on-item-click="changeTab(category.queryData)" v-for="category in categories" :text="category.name" :selected="currentTab===category.queryData">{{category.name}}</tab-item>
+	      <tab-item @on-item-click="changeTab(category.queryData)" v-for="category in categories" :key="categories.key" :text="category.name" :selected="currentTab===category.queryData">{{category.name}}</tab-item>
 	    </tab>
 	  	<scroller :on-refresh="refresh"
             :on-infinite="infinite" class="scroller-wrap">
@@ -67,7 +67,8 @@
 		      	{name: '精华',key: 'good',queryData:'good'}, 
 		      	{name: '分享',key: 'share',queryData:'share' }, 
 		      	{name: '招聘',key: 'job',queryData:'job' }, 
-		      	{name: '问答',key: 'ask',queryData:'ask' }
+		      	{name: '问答',key: 'ask',queryData:'ask' },
+		      	{name: '测试',key: 'dev',queryData:'dev' }
 	      	]
 		    return {
 		      	type: '1',

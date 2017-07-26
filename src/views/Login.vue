@@ -38,40 +38,18 @@
     methods: {
       onLogin () {
         let accessToken = this.accessToken;
-        if (!accessToken) {
+        this.$store.dispatch('login',accessToken);
+        if (this.$store.getters.loginInfo) {
           this.$vux.toast.show({
-            text: '请输入AccessToken',
+            text: '登录成功'
+          }); 
+          this.$router.push('/');
+        }else{
+          this.$vux.toast.show({
+            text: '登录失败',
             type: 'warn'
           })
-          return false
-        } else {
-          this.axios.post('https://cnodejs.org/api/v1/accesstoken', {
-            accesstoken: accessToken
-          })
-            .then(result => {
-              localStorage.setItem('accessToken', accessToken);
-              this.$store.commit('LOGIN_CHECK', {...result.data,accessToken});
-              this.setLoginInfoDetail(result.data.loginname);
-              this.$vux.toast.show({
-                text: '登录成功'
-              });
-            }).then(
-              this.getUnReadMessage(accessToken)
-            ).catch(() => {
-              localStorage.setItem('accessToken', null);
-              this.$vux.toast.show({
-                text: 'AccessToken 错误',
-                type: 'warn'
-              });
-            })
         }
-      },
-      getUnReadMessage(accessToken){
-        this.axios.get('https://cnodejs.org/api/v1/message/count?accesstoken='+accessToken).
-        then(result => {
-          this.$store.commit('SET_UNREAD_MESSAGE_NUM',1);
-          this.$router.push('/');
-        })
       },
       setLoginInfoDetail(loginname){
         this.axios.get('https://cnodejs.org/api/v1/user/'+loginname).

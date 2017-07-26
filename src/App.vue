@@ -23,9 +23,20 @@ export default {
     MenuBar,
     HeaderBar
   },
+  created() {
+    this.checkLogin();
+  },
   computed: {
     isLogin: function() {
       return this.$store.state.isLogin;
+    }
+  },
+  methods: {
+    checkLogin(){
+      let accessToken = localStorage.getItem('accessToken');
+      if (!accessToken === 'null'|| accessToken) {
+        this.$store.dispatch('login',accessToken);
+      }
     }
   }
 }

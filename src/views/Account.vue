@@ -53,12 +53,17 @@
         userInfo: this.$store.getters.loginInfoDetail
       }
     },
-    beforeCreate () {
-    	console.log(this.$store.getters.loginInfoDetail);
-	    if (!this.$store.getters.loginInfoDetail) {
-	      alert('please login');
-	      this.$router.push('/login');
-	    }
+    created () {
+      console.log(this.$store.getters);
+	    if (this.$store.getters.loginInfoDetail) {
+	      return;
+	    }else{
+        this.$vux.toast.show({
+            text: '请登录',
+            type: 'warn'
+        });
+        this.$router.push('/login');
+      }
     },
     components: {
     	Tab,

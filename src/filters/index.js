@@ -15,6 +15,8 @@ export function transformTab (tab, isTop,isGood) {
         return '招聘'
       case 'top':
         return '置顶'
+      case 'dev':
+        return '测试'
       default: 
         return false
     }

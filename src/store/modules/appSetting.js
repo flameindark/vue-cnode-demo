@@ -18,8 +18,29 @@ const getters = {
 
 
 const actions = {
-  set_login_info({commit,state},data) {
-    commit('SET_LOGIN_INFO',data)
+  login({commit,state},accessToken) {
+    axios.post('https://cnodejs.org/api/v1/accesstoken', {
+            accesstoken: accessToken
+          })
+            .then(result => {
+              // 获取用户信息
+              commit('SET_LOGIN_INFO', {...result.data,accessToken});
+              localStorage.setItem('accessToken', accessToken);
+              //获取用户详细信息
+              axios.get('https://cnodejs.org/api/v1/user/'+result.data.loginname).
+              then(res => {
+                commit('SET_LOGIN_INFO_DETAIL',res.data.data);
+              })
+            }).then(
+              //获取未读信息
+              axios.get(`https://cnodejs.org/api/v1/message/count?accesstoken=${accessToken}`).
+              then(result => {
+                commit('SET_UNREAD_MESSAGE_NUM',1);
+              })
+            ).catch(() => {
+              localStorage.removeItem('accessToken');
+            })
+
   },
   logout({commit,state}){
     commit('LOGOUT')
@@ -30,7 +51,7 @@ const actions = {
 }
 
 const mutations = {
-  [types.SET_LOGIN_INFO] (state,data){
+  [types.SET_LOGIN_INFO_DETAIL] (state,data){
     state.loginInfoDetail = data;
     state.isLogin = true;
   },
@@ -41,7 +62,7 @@ const mutations = {
   [types.ROUTER_CHANGE] (state,data){
     state.currentRouter = data;
   },
-  [types.LOGIN_CHECK] (state,data){
+  [types.SET_LOGIN_INFO] (state,data){
     state.loginInfo = data
   },
   [types.SET_UNREAD_MESSAGE_NUM] (state,data){
