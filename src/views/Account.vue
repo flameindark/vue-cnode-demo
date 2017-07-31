@@ -20,20 +20,20 @@
       <tab-item @click.native="onSwitchTab(1)">最新发布</tab-item>
     </tab>
     <div class="user-topiclist-wrap">
-      <div v-for="i in currentList" class="topic-li">
-        <router-link :to="`/topic/${i.id}`">
+      <div v-for="(item,index) in currentList" :key="index" >
+        <router-link :to="`/topic/${item.id}`">
           <div class="topic-item">
             <div class="avatar">
-              <img :src="i.author.avatar_url" alt="headImgUrl">
+              <img :src="item.author.avatar_url" alt="headImgUrl">
             </div>
             <div class="topic-info">
               <div class="topic-title">
-                <p v-text="i.title"></p>
+                <p v-text="item.title"></p>
               </div>
               <div class="topic-info-right">
                 <p>
-                  <span>{{i.author.loginname}}--</span>
-                  <span>{{i.last_reply_at | transformDateFromNow}}</span>
+                  <span>{{item.author.loginname}}--</span>
+                  <span>{{item.last_reply_at | transformDateFromNow}}</span>
                 </p>
               </div>
             </div>
@@ -44,66 +44,66 @@
   </div>
 </template>
 <script>
-	import { Tab,TabItem } from 'vux'
-  export default{
-    data () {
-      return {
-        currTab: 0,
-        currentList: [],
-        userInfo: this.$store.getters.loginInfoDetail
-      }
+import { Tab, TabItem } from 'vux'
+export default{
+  data () {
+    return {
+      currTab: 0,
+      currentList: [],
+      userInfo: this.$store.getters.loginInfoDetail
+    }
+  },
+  created () {
+    console.log(this.$store.getters)
+    if (this.$store.getters.loginInfoDetail) {
+      return
+    } else {
+      this.$vux.toast.show({
+        text: '请登录',
+        type: 'warn'
+      })
+      this.$router.push('/login')
+    }
+  },
+  components: {
+    Tab,
+    TabItem
+  },
+  methods: {
+    onLogout () {
+      localStorage.setItem('accessToken', null)
+      this.$store.commit('SET_LOGININFO', {
+        avatarUrl: '',
+        id: '',
+        loginname: '',
+        accessToken: null
+      })
+      this.$router.push('/login')
     },
-    created () {
-      console.log(this.$store.getters);
-	    if (this.$store.getters.loginInfoDetail) {
-	      return;
-	    }else{
+    onSwitchTab (tab) {
+      this.currTab = tab
+      this.onFetchUser(this.userInfo.loginname)
+    },
+    onFetchUser (id) {
+      this.axios.get(`https://cnodejs.org/api/v1/user/${id}`)
+      .then(result => {
+        this.currentList = this.currTab === 0 ? result.data.data.recent_replies : result.data.data.recent_topics
+      })
+      .catch(e => {
+        console.log(e)
         this.$vux.toast.show({
-            text: '请登录',
-            type: 'warn'
-        });
-        this.$router.push('/login');
-      }
-    },
-    components: {
-    	Tab,
-    	TabItem
-    },
-    methods: {
-      onLogout () {
-        localStorage.setItem('accessToken', null)
-        this.$store.commit('SET_LOGININFO', {
-          avatarUrl: '',
-          id: '',
-          loginname: '',
-          accessToken: null
+          text: '获取数据失败',
+          type: 'warn'
         })
-        this.$router.push('/login')
-      },
-      onSwitchTab (tab) {
-        this.currTab = tab
-        this.onFetchUser(this.userInfo.loginname)
-      },
-      onFetchUser (id) {
-        this.axios.get(`https://cnodejs.org/api/v1/user/${id}`)
-          .then(result => {
-            this.currentList = this.currTab === 0 ? result.data.data.recent_replies : result.data.data.recent_topics
-          })
-          .catch(e => {
-            console.log(e)
-            this.$vux.toast.show({
-              text: '获取数据失败',
-              type: 'warn'
-            })
-          })
-      },
-    },
-    computed: {
-      isShowBtnLogout: function () {
-        return this.$store.getters.loginInfo.loginname === this.userInfo.loginname
-      }
+      })
+    }
+  },
+  computed: {
+    isShowBtnLogout: function () {
+      return this.$store.getters.loginInfo.loginname === this.userInfo.loginname
     }
   }
+}
 </script>
 <style lang="less">
 	.user-wrap {

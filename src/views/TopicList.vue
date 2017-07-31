@@ -1,12 +1,12 @@
 <template>
 	<div class="topic-list">
 		<tab class="nav-bar">
-	      <tab-item @on-item-click="changeTab(category.queryData)" v-for="category in categories" :key="categories.key" :text="category.name" :selected="currentTab===category.queryData">{{category.name}}</tab-item>
+	      <tab-item @on-item-click="changeTab(category.queryData)" v-for="category in categories" :key="category.key" :text="category.name" :selected="currentTab===category.queryData">{{category.name}}</tab-item>
 	    </tab>
 	  	<scroller :on-refresh="refresh"
             :on-infinite="infinite" class="scroller-wrap">
 		  	<div class="topic-wrap">
-		        <div v-for="i in (this.$store.getters.topicList)" class="topic-item">
+		        <div v-for="i in (this.$store.getters.topicList)" class="topic-item" :key="i.id">
 		          <router-link :to="{ name: 'topic', params: { id: i.id }}">
 		            <div class="topic-title">
 		              <div class="topic-label" :class="[i.top ? 'topic-label-top' : `topic-label-other`]">
@@ -48,63 +48,63 @@
 </template>
 
 <script>
-	import { Panel,LoadMore,Tab,TabItem } from 'vux'
-	import Badge  from '../components/Badge'
-	let currentTab = 'all';
+	import { Panel, LoadMore, Tab, TabItem } from 'vux'
+	import Badge from '../components/Badge'
+	let currentTab = 'all'
 
 	export default {
-		name: 'TopicList',
-		components: {
-			Panel,
-			LoadMore,
-			Tab,
-			TabItem,
-			Badge
-		},
-		data () {
-			const categories = [
-		      	{name: '全部',key: 'all' ,queryData:'all'},
-		      	{name: '精华',key: 'good',queryData:'good'}, 
-		      	{name: '分享',key: 'share',queryData:'share' }, 
-		      	{name: '招聘',key: 'job',queryData:'job' }, 
-		      	{name: '问答',key: 'ask',queryData:'ask' },
-		      	{name: '测试',key: 'dev',queryData:'dev' }
-	      	]
-		    return {
-		      	type: '1',
-		      	loadTip: 'loading',
-		      	categories: categories,
-		    }
-	    },
-	    computed: {
-	    	currentTab : function () {
-	    		return this.$store.getters.currentTab;
-	    	}
-	    },
-	    methods: {
-	    	changeTab(queryData) {
-	    		currentTab = queryData;
-	    		this.$store.dispatch('change_tab',currentTab);
-				this.$store.dispatch('refreshTopiclistData');
-	    	},
-	    	refresh(done){
-	    		setTimeout(() => {
-		    		this.$store.dispatch('change_tab',currentTab);
-					this.$store.dispatch('refreshTopiclistData');
-					done()
-        		}, 1000)
-	    	},
-	    	infinite(done){
-	    		setTimeout(() => {
-		    		this.$store.dispatch('change_tab',currentTab);
-			    	this.$store.dispatch('loadMoreTopicList');
-			    	done()
-		    	}, 1000)
-	    	},
-	    	isShowBadge(item){
-	    		return item.tab||item.top || item.good
-	    	}
-	    }
+  name: 'TopicList',
+  components: {
+	    Panel,
+	    LoadMore,
+	    Tab,
+	    TabItem,
+	    Badge
+	  },
+	  data () {
+	    const categories = [
+        {name: '全部', key: 'all', queryData: 'all'},
+	      {name: '精华', key: 'good', queryData: 'good'},
+        {name: '分享', key: 'share', queryData: 'share'},
+        {name: '招聘', key: 'job', queryData: 'job'},
+        {name: '问答', key: 'ask', queryData: 'ask'},
+        {name: '测试', key: 'dev', queryData: 'dev'}
+    ]
+    return {
+      type: '1',
+      loadTip: 'loading',
+      categories: categories
+    }
+  },
+  computed: {
+    currentTab: function () {
+      return this.$store.getters.currentTab
+    }
+	  },
+  methods: {
+    changeTab (queryData) {
+      currentTab = queryData
+      this.$store.dispatch('change_tab', currentTab)
+      this.$store.dispatch('refreshTopiclistData')
+    },
+    refresh (done) {
+      setTimeout(() => {
+        this.$store.dispatch('change_tab', currentTab)
+        this.$store.dispatch('refreshTopiclistData')
+        done()
+      }, 1000)
+    },
+    infinite (done) {
+      setTimeout(() => {
+        this.$store.dispatch('change_tab', currentTab)
+        this.$store.dispatch('loadMoreTopicList')
+        done()
+      }, 1000)
+    },
+    isShowBadge (item) {
+      return item.tab || item.top || item.good
+    }
+	  }
 	}
 </script>
 

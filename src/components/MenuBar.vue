@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { Tabbar, TabbarItem } from 'vux';
+import { Tabbar, TabbarItem } from 'vux'
 
 export default {
   name: 'MenuBar',
@@ -30,7 +30,7 @@ export default {
     TabbarItem
   },
   computed: {
-    message_num(){
+    message_num () {
       return ''
     }
   }

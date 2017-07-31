@@ -4,37 +4,37 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import Vuex from 'vuex'
-import moment from 'moment'
 import store from './store'
 import VueScroller from 'vue-scroller'
 import * as filters from './filters'
-import  { ToastPlugin } from 'vux'
+import { ToastPlugin } from 'vux'
 import vuexI18n from 'vuex-i18n'
 
 // I18n setting
-Vue.use(vuexI18n.plugin, store);
+Vue.use(vuexI18n.plugin, store)
 
-Vue.use(VueScroller);
-Vue.use(Vuex);
+Vue.use(VueScroller)
+Vue.use(Vuex)
 
-//use Toast Plugin
+// use Toast Plugin
 Vue.use(ToastPlugin)
 
-//注册filters
+// 注册filters
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
 
-Vue.config.productionTip = false;
+Vue.config.productionTip = false
 
-//监听router的变化
-router.beforeEach(function(to,from,next){
-  store.dispatch('router_change',to.path);
-  next();
+// 监听router的变化
+router.beforeEach(function (to, from, next) {
+  store.dispatch('router_change', to.path)
+  next()
 })
 
+/* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: '#app-box',
   router,
   store,
   template: '<App/>',

@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import Login from './views/Login.vue';
-import MenuBar from './components/MenuBar.vue';
-import HeaderBar from './components/HeaderBar.vue';
+import Login from './views/Login.vue'
+import MenuBar from './components/MenuBar.vue'
+import HeaderBar from './components/HeaderBar.vue'
 
 export default {
   name: 'app',
@@ -23,19 +23,19 @@ export default {
     MenuBar,
     HeaderBar
   },
-  created() {
-    this.checkLogin();
+  created () {
+    this.checkLogin()
   },
   computed: {
-    isLogin: function() {
-      return this.$store.state.isLogin;
+    isLogin: function () {
+      return this.$store.state.isLogin
     }
   },
   methods: {
-    checkLogin(){
-      let accessToken = localStorage.getItem('accessToken');
-      if (!accessToken === 'null'|| accessToken) {
-        this.$store.dispatch('login',accessToken);
+    checkLogin () {
+      let accessToken = localStorage.getItem('accessToken')
+      if (!accessToken === 'null' || accessToken) {
+        this.$store.dispatch('login', accessToken)
       }
     }
   }

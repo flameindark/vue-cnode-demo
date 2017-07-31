@@ -25,7 +25,7 @@
   	  		<div class="comment-count">
   		        {{topic.reply_count ? topic.reply_count:0}} 条回复
   		    </div>
-  		    <div class="comment-item" v-for="(c, index) in topic.replies">
+  		    <div class="comment-item" v-for="(c, index) in topic.replies" :key="c.index">
   		        <div class="comment-head">
   		          <router-link :to="'/account/'+c.author.loginname">
   		            <div class="avatar">
@@ -61,46 +61,46 @@
       return {
         page: 1,
         pageSize: 10,
-        topic: null,
+        topic: null
       }
     },
     components: {
-       Badge,
-       Loading
+      Badge,
+      Loading
     },
     watch: {
-    '$route': 'fetchData'
+      '$route': 'fetchData'
     },
     created () {
-      this.fetchData();
-      console.log(this.topic);
+      this.fetchData()
+      console.log(this.topic)
     },
     deactivated () {
       window.onscroll = null
     },
     computed: {
       isDataLoadingSuccess: function () {
-        return this.$store.getters.topic.id === this.$route.params.id;
+        return this.$store.getters.topic.id === this.$route.params.id
       }
     },
     methods: {
-      fetchData(){
-        let url;
-        if(this.$store.getters.loginInfo){
-          url = `https://cnodejs.org/api/v1/topic/${this.$route.params.id}?accesstoken=${this.$store.getters.loginInfo.accessToken}`;
-        }else{
-          url = `https://cnodejs.org/api/v1/topic/${this.$route.params.id}`;
+      fetchData () {
+        let url
+        if (this.$store.getters.loginInfo) {
+          url = `https://cnodejs.org/api/v1/topic/${this.$route.params.id}?accesstoken=${this.$store.getters.loginInfo.accessToken}`
+        } else {
+          url = `https://cnodejs.org/api/v1/topic/${this.$route.params.id}`
         }
         this.axios.get(url)
           .then(result => {
-            this.topic = result.data.data;
-            this.iscollect = result.data.data.is_collect;
-            console.log(this.topic);
+            this.topic = result.data.data
+            this.iscollect = result.data.data.is_collect
+            console.log(this.topic)
           })
           .catch(e => {
             this.$vux.toast.show({
-                text: '操作失败',
-                type: 'warn'
+              text: '操作失败',
+              type: 'warn'
             })
           })
       },
@@ -118,21 +118,21 @@
       },
       onLikeTopic () {
         if (this.checkLogin()) {
-          let url;
-          let toastText;
+          let url
+          let toastText
           if (!this.topic.is_collect) {
-            url = 'https://cnodejs.org/api/v1/topic_collect/collect';
-            toastText = '收藏成功';
+            url = 'https://cnodejs.org/api/v1/topic_collect/collect'
+            toastText = '收藏成功'
           } else {
-            url = 'https://cnodejs.org/api/v1/topic_collect/de_collect';
-            toastText = '取消收藏成功';
+            url = 'https://cnodejs.org/api/v1/topic_collect/de_collect'
+            toastText = '取消收藏成功'
           }
           this.axios.post(url, {
             accesstoken: this.$store.getters.loginInfo.accessToken,
             topic_id: this.topic.id
           })
             .then(result => {
-              this.topic.is_collect = !this.topic.is_collect;
+              this.topic.is_collect = !this.topic.is_collect
               this.$vux.toast.show({
                 text: toastText
               })
@@ -151,11 +151,11 @@
 </script>
 <style lang="less">
 	/** common */
-	.avatar {
-		float: left;
-		width: 40px;
+	.avatar {	
+    display: inline-block;
+    width: 40px;
 		height: 40px;
-		display: inline-block;
+	
 		img {
 			width: 100%;
 			height: 100%;

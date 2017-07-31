@@ -4,25 +4,25 @@
 
 <script>
 	export default {
-		name:'Badge',
-		props:{
-			text:{
-				require: true
-			},
-			width:{
-				require: false,
-				default: '36'
-			},
-			height:{
-				require: false,
-				default: '20'
-			},
-			fontSize:{
-				require: false,
-				default: '12'
-			}
-		}
-	}
+	  name: 'Badge',
+	  props: {
+	    text: {
+	      require: true
+    },
+	    width: {
+	      require: false,
+	      default: '36'
+    },
+	    height: {
+	      require: false,
+	      default: '20'
+    },
+	    fontSize: {
+	      require: false,
+	      default: '12'
+    }
+  }
+}
 </script>
 <style>
 	.badge {

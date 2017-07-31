@@ -11,78 +11,76 @@
 </template>
 
 <script>
-	import { Selector, Group , XInput, XTextarea, XButton } from 'vux';
+	import { Selector, Group, XInput, XTextarea, XButton } from 'vux'
 
 	export default {
-		name:'NewTopic',
-		components: {
-			Selector,
-			Group,
-			XInput,
-			XTextarea,
-			XButton
-		},
-		data() {
-			return {
-				tab: '',
-				title:'',
-				content:'',
-				list: [
-					{
-						key: 'ask',
-						 value: '问答'
-					}, 
-					{
-						key: 'share', 
-						value: '分享'
-					},
-					{
-						key: 'job',
-						value: '招聘'
-					},
-					{
-						key:'dev',
-						value: '测试'
-					}
-				]
-			}
-		},
-		methods: {
-			submitTopic(){
-				
-				if (!this.$store.getters.loginInfo) {
-					this.$vux.toast.show({
-			           text: '请先登录',
-			           type: 'warn'
-			        })
-			        this.$router.push('/login')
-					return false;
-				}
-				let accesstoken = this.$store.getters.loginInfo.accessToken;
-				let data = {
-					content: this.content,
-					title: this.title,
-					tab: this.tab,
-					accesstoken: accesstoken
-				}
-				console.log('data:'+data);
-				
-		        this.axios.post('https://cnodejs.org/api/v1/topics',data).
-		            then(result => {
-		                if (result.data.success) {
-		                    this.$vux.toast.show({
-		                    	text: '发布成功'
-		                    });
-		                    this.$router.push('/');
-		                }else{
-		                    this.$vux.toast.show({
-		                    	text: '发布失败',
-		                    	type: 'warn'
-		                    });
-		                }
-		            })
-			}
-		}
+	  name: 'NewTopic',
+	  components: {
+	    Selector,
+	    Group,
+	    XInput,
+	    XTextarea,
+	    XButton
+	  },
+	  data () {
+	    return {
+	      tab: '',
+	      title: '',
+	      content: '',
+	      list: [
+	        {
+	          key: 'ask',
+	          value: '问答'
+	        },
+	        {
+	          key: 'share',
+	          value: '分享'
+	        },
+	        {
+	          key: 'job',
+	          value: '招聘'
+	        },
+	        {
+	          key: 'dev',
+	          value: '测试'
+	        }
+	      ]
+	    }
+	  },
+	  methods: {
+	    submitTopic () {
+	      if (!this.$store.getters.loginInfo) {
+	        this.$vux.toast.show({
+	          text: '请先登录',
+	          type: 'warn'
+	        })
+	        this.$router.push('/login')
+	        return false
+	      }
+	      let accesstoken = this.$store.getters.loginInfo.accessToken
+	      let data = {
+	        content: this.content,
+	        title: this.title,
+	        tab: this.tab,
+	        accesstoken: accesstoken
+	      }
+	      console.log('data:' + data)
+	      this.axios.post('https://cnodejs.org/api/v1/topics', data)
+	      .then(result => {
+	        if (result.data.success) {
+	          this.$vux.toast.show({
+	            text: '发布成功'
+	          })
+	          this.$router.push('/')
+	        } else {
+	          this.$vux.toast.show({
+	            text: '发布失败',
+	            type: 'warn'
+	          })
+	        }
+	      })
+	    }
+	  }
 	}
 </script>
 <style lang="less">

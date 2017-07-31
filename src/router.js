@@ -1,11 +1,10 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-import TopicList from './views/TopicList';
-import TopicListDemo from './views/TopicList-demo';
-import NewTopic from './views/NewTopic';
-import Message from './views/Message';
-import Account from './views/Account';
-import TopicDetail from './views/TopicDetail';
+import Vue from 'vue'
+import Router from 'vue-router'
+import TopicList from './views/TopicList'
+import NewTopic from './views/NewTopic'
+import Message from './views/Message'
+import Account from './views/Account'
+import TopicDetail from './views/TopicDetail'
 import Login from './views/Login'
 
 Vue.use(Router)
@@ -24,14 +23,14 @@ const router = new Router({
       component: NewTopic
     },
     {
-    	path: '/message',
-    	name: 'message',
-    	component: Message
+      path: '/message',
+      name: 'message',
+      component: Message
     },
     {
-    	path: '/account',
-    	name: 'account',
-    	component: Account
+      path: '/account',
+      name: 'account',
+      component: Account
     },
     {
       path: '/topic/:id',
@@ -49,7 +48,6 @@ const router = new Router({
       component: Account
     }
   ]
-});
-
+})
 
 export default router

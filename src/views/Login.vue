@@ -21,44 +21,44 @@
   </div>
 </template>
 <script>
-  import { XButton,XInput,Flexbox,Group,FlexboxItem } from 'vux'
-  export default{
-    data () {
-      return {
-        accessToken: ''
-      }
-    },
-    components: {
-      XButton,
-      XInput,
-      Flexbox,
-      Group,
-      FlexboxItem,
-    },
-    methods: {
-      onLogin () {
-        let accessToken = this.accessToken;
-        this.$store.dispatch('login',accessToken);
-        if (this.$store.getters.loginInfo) {
-          this.$vux.toast.show({
-            text: '登录成功'
-          }); 
-          this.$router.push('/');
-        }else{
-          this.$vux.toast.show({
-            text: '登录失败',
-            type: 'warn'
-          })
-        }
-      },
-      setLoginInfoDetail(loginname){
-        this.axios.get('https://cnodejs.org/api/v1/user/'+loginname).
-        then(result => {
-          this.$store.commit('SET_LOGIN_INFO',result.data.data);
+import { XButton, XInput, Flexbox, Group, FlexboxItem } from 'vux'
+export default{
+  data () {
+    return {
+      accessToken: ''
+    }
+  },
+  components: {
+    XButton,
+    XInput,
+    Flexbox,
+    Group,
+    FlexboxItem
+  },
+  methods: {
+    onLogin () {
+      let accessToken = this.accessToken
+      this.$store.dispatch('login', accessToken)
+      if (this.$store.getters.loginInfo) {
+        this.$vux.toast.show({
+          text: '登录成功'
+        })
+        this.$router.push('/')
+      } else {
+        this.$vux.toast.show({
+          text: '登录失败',
+          type: 'warn'
         })
       }
+    },
+    setLoginInfoDetail (loginname) {
+      this.axios.get('https://cnodejs.org/api/v1/user/' + loginname)
+      .then(result => {
+        this.$store.commit('SET_LOGIN_INFO', result.data.data)
+      })
     }
   }
+}
 </script>
 <style lang="less">
   .login-wrap {
